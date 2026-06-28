@@ -1,0 +1,184 @@
+{
+  "$schema": "https://www.krakend.io/schema/v2.6/config.json",
+  "version": 3,
+  "name": "Ticketing API Gateway",
+  "timeout": "10s",
+  "cache_ttl": "300s",
+  "output_encoding": "json",
+
+  "extra_config": {
+    "telemetry/logging": {
+      "level": "DEBUG",
+      "prefix": "[KRAKEND]",
+      "syslog": false,
+      "stdout": true
+    },
+    "security/cors": {
+      "allow_origins": ["http://localhost:4200"],
+      "allow_methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+      "allow_headers": [
+        "Origin",
+        "Authorization",
+        "Content-Type",
+        "Accept"
+      ],
+      "expose_headers": ["Content-Length"],
+      "allow_credentials": true,
+      "max_age": "12h"
+    }
+  },
+
+  "endpoints": [
+
+    {
+      "__comment": "──── TICKETS ────────────────────────────────────────────────",
+      "endpoint": "/api/tickets",
+      "method": "GET",
+      "output_encoding": "json",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://keycloak:8180/realms/ticket/protocol/openid-connect/certs",
+          "cache": true,
+          "cache_duration": 900,
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "roles_key": "roles",
+          "roles_key_is_nested": false,
+          "roles": ["customer", "support_l1", "support_l2", "supervisor"],
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["roles", "x-user-roles"],
+            ["email", "x-user-email"]
+          ]
+        }
+      },
+      "backend": [{
+        "url_pattern": "/tickets",
+        "method": "GET",
+        "host": ["http://backend:9090"],
+        "encoding": "json"
+      }]
+    },
+
+    {
+      "endpoint": "/api/tickets",
+      "method": "POST",
+      "output_encoding": "json",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://keycloak:8180/realms/ticket/protocol/openid-connect/certs",
+          "cache": true,
+          "disable_jwk_security": true,
+          "roles_key": "roles",
+          "roles": ["customer", "support_l1", "support_l2", "supervisor"],
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["roles", "x-user-roles"],
+            ["email", "x-user-email"]
+          ]
+        }
+      },
+      "backend": [{
+        "url_pattern": "/tickets",
+        "method": "POST",
+        "host": ["http://backend:9090"],
+        "encoding": "json"
+      }]
+    },
+
+    {
+      "endpoint": "/api/tickets/{id}",
+      "method": "GET",
+      "output_encoding": "json",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://keycloak:8180/realms/ticket/protocol/openid-connect/certs",
+          "cache": true,
+          "disable_jwk_security": true,
+          "roles_key": "roles",
+          "roles": ["customer", "support_l1", "support_l2", "supervisor"],
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["roles", "x-user-roles"]
+          ]
+        }
+      },
+      "backend": [{
+        "url_pattern": "/tickets/{id}",
+        "method": "GET",
+        "host": ["http://backend:9090"],
+        "encoding": "json"
+      }]
+    },
+
+    {
+      "endpoint": "/api/tickets/{id}",
+      "method": "PUT",
+      "output_encoding": "json",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://keycloak:8180/realms/ticket/protocol/openid-connect/certs",
+          "cache": true,
+          "disable_jwk_security": true,
+          "roles_key": "roles",
+          "roles": ["support_l1", "support_l2", "supervisor"],
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["roles", "x-user-roles"]
+          ]
+        }
+      },
+      "backend": [{
+        "url_pattern": "/tickets/{id}",
+        "method": "PUT",
+        "host": ["http://backend:9090"],
+        "encoding": "json"
+      }]
+    },
+
+    {
+      "__comment": "──── COMMENTI ───────────────────────────────────────────────",
+      "endpoint": "/api/tickets/{id}/comments",
+      "method": "POST",
+      "output_encoding": "json",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://keycloak:8180/realms/ticket/protocol/openid-connect/certs",
+          "cache": true,
+          "disable_jwk_security": true,
+          "roles_key": "roles",
+          "roles": ["customer", "support_l1", "support_l2", "supervisor"],
+          "propagate_claims": [
+            ["sub", "x-user-id"],
+            ["roles", "x-user-roles"]
+          ]
+        }
+      },
+      "backend": [{
+        "url_pattern": "/tickets/{id}/comments",
+        "method": "POST",
+        "host": ["http://backend:9090"],
+        "encoding": "json"
+      }]
+    },
+
+    {
+      "__comment": "──── HEALTH (pubblico, senza auth) ──────────────────────────",
+      "endpoint": "/health",
+      "method": "GET",
+      "output_encoding": "json",
+      "backend": [{
+        "url_pattern": "/health",
+        "method": "GET",
+        "host": ["http://backend:9090"],
+        "encoding": "json"
+      }]
+    }
+
+  ]
+}

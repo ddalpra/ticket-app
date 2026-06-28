@@ -1,0 +1,125 @@
+{
+  "realm": "ticket",
+  "displayName": "Ticket Realm",
+  "enabled": true,
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+
+  "roles": {
+    "realm": [
+      { "name": "customer",    "description": "Cliente finale" },
+      { "name": "support_l1",  "description": "Supporto livello 1" },
+      { "name": "support_l2",  "description": "Supporto livello 2" },
+      { "name": "supervisor",  "description": "Supervisore" }
+    ]
+  },
+
+  "clients": [
+    {
+      "clientId": "angular-client",
+      "name": "Angular SPA",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://localhost:4200/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200"
+      ],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm-roles-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "krakend-client",
+      "name": "KrakenD Backend Client",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "secret": "krakend_client_secret_change_me",
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "backend-client",
+      "name": "Go Backend Client",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "secret": "backend_client_secret_change_me",
+      "protocol": "openid-connect"
+    }
+  ],
+
+  "users": [
+    {
+      "username": "supervisor1",
+      "email": "supervisor1@example.com",
+      "firstName": "Mario",
+      "lastName": "Rossi",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "Password1!", "temporary": false }],
+      "realmRoles": ["supervisor"]
+    },
+    {
+      "username": "agent1",
+      "email": "agent1@example.com",
+      "firstName": "Giulia",
+      "lastName": "Bianchi",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "Password1!", "temporary": false }],
+      "realmRoles": ["support_l1"]
+    },
+    {
+      "username": "agent2",
+      "email": "agent2@example.com",
+      "firstName": "Luca",
+      "lastName": "Verdi",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "Password1!", "temporary": false }],
+      "realmRoles": ["support_l2"]
+    },
+    {
+      "username": "customer1",
+      "email": "customer1@example.com",
+      "firstName": "Anna",
+      "lastName": "Neri",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "Password1!", "temporary": false }],
+      "realmRoles": ["customer"]
+    }
+  ],
+
+  "scopeMappings": [],
+  "clientScopeMappings": {}
+}
