@@ -1,0 +1,3 @@
+[submodule "go-tck-srv"]
+	path = go-tck-srv
+	url = https://github.com/ddalpra/go-tck-srv.git
